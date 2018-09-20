@@ -93,5 +93,9 @@ public class MapTiles implements Serializable
          System.out.print("  ");
       }
    }
+   public void defeatedEnemy()
+   {
+       containsEnemy = false;
+   }
    
 }

@@ -285,6 +285,7 @@ public class newRPG
          if(dungeon.getTile(playerY, playerX).getContainsEnemy())
          {
             player = combat(player);
+            dungeon.getTile(playerY, playerX).defeatedEnemy();
          }
          System.out.println(playerY + " " + playerX);
          System.out.println("Health: " + player.getCurrentHP() + "/" + player.getMaxHP());
