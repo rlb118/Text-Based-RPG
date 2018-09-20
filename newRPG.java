@@ -7,6 +7,14 @@ import java.io.*;
 *    @version 0.0.4
 *    @author Robert Blake
 */
+
+/*
+Important note: I'm aware many of the methods within this program should be private. They are not for the
+simple fact that I wanted good javadoc practice and was using this as a programming learning tool to 
+reteach myself java before college started
+*/
+
+
 public class newRPG 
 {
    //the keyboard variable is here because I am tired of having it in every method that needs it
@@ -265,7 +273,11 @@ public class newRPG
 
    public static UserData spelunking(UserData player)
    {
-      DungeonMap dungeon = dunGen(1);
+      DungeonMap dungeon = dungeonChoose();
+      if(dungeon == null)
+      {
+         return player;
+      }
       int playerX = 0;
       int playerY = 0;
       do
@@ -382,9 +394,24 @@ public class newRPG
    }
    
    /**
-   *    dunGen is the method that currently creates the dungeon.
-   *    In the current version, only one dungeon is able to be created. The only thing that
-   *    changes between the runs of the current dungeon is the enemy count within.
+   *    dungeonChoose is the method that is used to choose which dungeon the player loads.
+   *    As it stands, it merely presents the options for the player and reads the input to send it
+   *    to the dunGen method.
+   *    @return the DungeonMap from the dunGen method
+   */
+   
+   public static DungeonMap dungeonChoose()
+   {
+      System.out.println("Choose a dungeon: \n1.) Beginner Dungeon\n2.) Ancient Ruins\n");
+      int dunChoice = keyboard.nextInt();
+      keyboard.nextLine();
+      return dunGen(dunChoice);
+   }
+   
+   /**
+   *    dunGen is the method that currently creates the dungeon or loads one from a file.
+   *    In the current version, two dungeons exist: the built-in generated one, and one made with the 
+   *    dev tool as a test of that function.
    *    @param dungeonOption chooses which of several possible dungeons is generated
    *    @return the newly generated map of the chosen dungeon
    */
@@ -392,11 +419,12 @@ public class newRPG
    public static DungeonMap dunGen(int dungeonOption)
    {
       Random dungRNG = new Random();
-      DungeonMap map = new DungeonMap();
-      
+      DungeonMap map = null;
+      String dungeonName = "";
       switch(dungeonOption)
       {
          case 1:
+            map = new DungeonMap();
             int width = 20;
             int length = 30;
             int lastXValue = 0;
@@ -472,7 +500,34 @@ public class newRPG
                }
             }
             map.setTile(0, lastXValue, new MapTiles(true, false, false, false, true));
+         case 2:
+            dungeonName = "ruins";
+            break;
+         default:
+            System.out.println("Invalid input.");
+            return null;
+             
       }
+      if(dungeonOption != 1)
+      {
+         try
+         {
+            FileInputStream dungeonLoad = new FileInputStream("DungeonMaps/" + dungeonName + ".dmd");
+            ObjectInputStream dungeonInputFile = new ObjectInputStream(dungeonLoad);
+            map = (DungeonMap) dungeonInputFile.readObject();
+         }
+         catch(IOException wrongName)
+         {
+            System.out.println("It seems the " + dungeonName + " file could not be found.\nError Code: No Laura or Dora");
+            return null;
+         }
+         catch(ClassNotFoundException missingDungeons)
+         {
+            System.out.println("You seem to be missing the DungeonMap class. \nError Code: Missing all maps");
+            return null;
+         }
+      }
+     
       return map;
    }
    
@@ -579,9 +634,9 @@ public class newRPG
          System.out.println("I'm sorry, your file was not found. Please try again.");
          return null;
       }
-      catch(ClassNotFoundException somethingsFucky)
+      catch(ClassNotFoundException missingPlayer)
       {
-         System.out.println("This is, in fact, a really bad thing. And impossible \nError Code: Fuck me sideways");
+         System.out.println("Somehow, you lack the UserData class file.\nError Code: Missing Player");
          return null;
       }
    }
